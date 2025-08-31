@@ -25,16 +25,29 @@ router.post("/register", async (req, res) => {
   }
 });
 
+
+
+
+
+
 router.post("/login", async (req, res) => {
   try {
     const { emailOrUsername, password } = req.body;
-    const query = emailOrUsername.includes("@") ? { email: emailOrUsername } : { username: emailOrUsername };
+    const query = emailOrUsername.includes("@")
+      ? { email: emailOrUsername }
+      : { username: emailOrUsername };
+
     const user = await User.findOne(query);
     if (!user) return res.status(400).json({ error: "Invalid credentials" });
+
     const ok = await user.comparePassword(password);
     if (!ok) return res.status(400).json({ error: "Invalid credentials" });
+
     const token = sign(user);
-    res.json({ token, user: { id: user._id, username: user.username, email: user.email }});
+    res.json({
+      token,
+      user: { id: user._id, username: user.username, email: user.email }
+    });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
